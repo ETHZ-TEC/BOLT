@@ -47,14 +47,15 @@
 
 #include "main.h"
 
-
-#pragma SET_DATA_SECTION(".sysmem")           // put the following variables into the FRAM section .sysmem
-FIFOQueue queueAtoCCtrl;                // control structure for queue from application to communication processor
-FIFOQueue queueCtoACtrl;                // control structure for queue from communication to application processor
-FIFOMessage queueAtoCData[MAX_NUM_OF_MSG_A_TO_C];     // the actual queue data (including the size of the messages)
-FIFOMessage queueCtoAData[MAX_NUM_OF_MSG_C_TO_A];
-#pragma SET_DATA_SECTION()
-
+// put the following variables into a predefined FRAM section
+#pragma DATA_SECTION(queueAtoCCtrl, ".sysmem")
+FIFOQueue queueAtoCCtrl = { 0 };                // control structure for queue from application to communication processor
+#pragma DATA_SECTION(queueCtoACtrl, ".sysmem")
+FIFOQueue queueCtoACtrl = { 0 };                // control structure for queue from communication to application processor
+#pragma DATA_SECTION(queueAtoCData, ".sysmem")
+FIFOMessage queueAtoCData[MAX_NUM_OF_MSG_A_TO_C] = { 0 };     // the actual queue data (including the size of the messages)
+#pragma DATA_SECTION(queueCtoAData, ".sysmem")
+FIFOMessage queueCtoAData[MAX_NUM_OF_MSG_C_TO_A] = { 0 };
 
 
 // overwrite the whole queue memory with a custom value
@@ -79,7 +80,7 @@ void clearQueues()
 #ifdef DEBUG
   fillQueueMemory(0x1234);
 #endif // DEBUG
-  LOG_INFO_2("FIFO queues cleared (address space: %h - %h)", (uint32_t)queueAtoCCtrl.first, (uint32_t)queueCtoACtrl.last);
+  printLine(composeString("FIFO queues cleared (address space: %h - %h)", (uint32_t)queueAtoCCtrl.first, (uint32_t)queueCtoACtrl.last, debugBuffer));
   SPI_IND_LOW(FSMINST_COMM_PROC);
   SPI_IND_LOW(FSMINST_APPL_PROC);
 }
@@ -88,8 +89,12 @@ void clearQueues()
 // this function ensures that the queue pointers are valid (within the queue memory boundaries) and must be called prior to using the queues
 void initQueues()
 {
-  // if any parameter seems invalid, then reset the queue, otherwise don't touch it
-  if (RESET_QUEUES_AT_STARTUP)
+  // make sure the queue is valid when the MCU starts up for the first time after programming
+  if (RESET_QUEUES_AT_STARTUP ||
+      queueAtoCCtrl.first != queueAtoCData ||
+      queueAtoCCtrl.last  != &queueAtoCData[MAX_NUM_OF_MSG_A_TO_C - 1] ||
+      queueCtoACtrl.first != queueCtoAData ||
+      queueCtoACtrl.last  != &queueCtoAData[MAX_NUM_OF_MSG_C_TO_A - 1])
   {
     clearQueues();
 
@@ -108,6 +113,7 @@ void initQueues()
              (((uint16_t)queueCtoACtrl.nextWrite - (uint16_t)queueCtoAData) % MESSAGE_SIZE_WITH_METADATA) != 0)
   {
     LOG_ERROR("ERROR: Queues corrupted (invalid read / write pointers)");
+
     clearQueues();
   }
   LOG_INFO_2("FIFO queues initialized (%u msg/queue, %u B/msg)", MAX_NUM_OF_MSG_A_TO_C, MESSAGE_SIZE);

@@ -41,9 +41,9 @@
 
 
 #define MESSAGE_SIZE              128   // max. size of 1 message in the queue in bytes, MUST be a multiple of 2!!
-#define MAX_NUM_OF_MSG_A_TO_C     148   // max. number of messages in queue A to C (~380 for 48 byte msg & debugging off)
-#define MAX_NUM_OF_MSG_C_TO_A     148   // max. number of messages in queue C to A
-#define RESET_QUEUES_AT_STARTUP   1     // 0 = no queue reset (clear) at startup
+#define MAX_NUM_OF_MSG_A_TO_C     146   // max. number of messages in queue A to C (~380 for 48 byte msg & debugging off)
+#define MAX_NUM_OF_MSG_C_TO_A     146   // max. number of messages in queue C to A
+#define RESET_QUEUES_AT_STARTUP   0     // 0 = no queue reset (clear) at startup
 
 
 #define ERROR_LOGGING_TO_FRAM           // log the first occurring error into the FRAM for later readout (has no effect in debug mode)

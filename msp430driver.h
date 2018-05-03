@@ -778,7 +778,7 @@ static __inline void DMA_setDstAddressInline(uint8_t channelSelect,
 
 // replaces EUSCI_A_SPI_slaveInit and EUSCI_B_SPI_slaveInit
 #pragma FUNC_ALWAYS_INLINE(EUSCI_SPI_slaveInitInline)
-static __inline EUSCI_SPI_slaveInitInline(uint32_t baseAddress,
+static __inline void EUSCI_SPI_slaveInitInline(uint32_t baseAddress,
                       uint16_t msbFirst,
                       uint16_t clockPhase,
                       uint16_t clockPolarity,

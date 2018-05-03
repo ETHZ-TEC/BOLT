@@ -210,9 +210,9 @@ void initMSP430()
 #endif // PUSH_BUTTON_PORT
 
   // now init eUSCI modules
-#if defined(DEBUG) || defined(LOG_ERRORS)
+//#if defined(DEBUG) || defined(LOG_ERRORS)     // init anyway to print out stats
   initUART();
-#endif // defined(DEBUG) || defined(LOG_ERRORS)
+//#endif
   initSPI();
 
   // disable the GPIO power-on default high-impedance mode to activate previously configured port settings

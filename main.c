@@ -200,10 +200,6 @@ void collectStats(void)
     }
   }
 #endif /* PUSH_BUTTON_PORT */
-
-#ifndef DEBUG
-  UART_DISABLE;
-#endif
 }
 
 
@@ -216,20 +212,23 @@ int main(void)
   validateSysState();  // restore the system state (init state machine)
   initQueues();      // initialize the required data structures
   LOG_INFO("Initialization complete\r\n" LOG_LINE "\r\n");
+
+#ifndef DEBUG
+  UART_DISABLE;
+#endif
   ENABLE_INTERRUPTS;
 
   // blink once
-  GPIO_toggleOutputOnPinInline(LED_1_PORT, LED_1_PIN);
-  WAIT(200);
-  GPIO_toggleOutputOnPinInline(LED_1_PORT, LED_1_PIN);
+  GPIO_setOutputHighOnPinInline(LED_1_PORT, LED_1_PIN);
+  WAIT(20);
+  GPIO_setOutputLowOnPinInline(LED_1_PORT, LED_1_PIN);
 
   // make sure the signature is not omitted by the linker
   (void)*(volatile uint16_t*)boltSig;
 
   // --- READY, program execution starts here ---
 
-  LOG_INFO("Entering low-power mode...");
-  ENTER_LPM4;
+  ENTER_LPM4;   // enter low-power mode 4
 
-  while (1);  // just in case, should never be executed
+  while (1);
 }

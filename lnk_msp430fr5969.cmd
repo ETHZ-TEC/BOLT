@@ -1,5 +1,5 @@
 /* ============================================================================ */
-/* Copyright (c) 2015, Texas Instruments Incorporated                           */
+/* Copyright (c) 2017, Texas Instruments Incorporated                           */
 /*  All rights reserved.                                                        */
 /*                                                                              */
 /*  Redistribution and use in source and binary forms, with or without          */
@@ -44,7 +44,7 @@
 /* -heap   0x0100                                   HEAP AREA SIZE            */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-/* Version: 1.173                                                             */
+/* Version: 1.203                                                             */
 /*----------------------------------------------------------------------------*/
 
 /****************************************************************************/
@@ -130,46 +130,60 @@ MEMORY
 
 SECTIONS
 {
-    GROUP(READ_WRITE_MEMORY)
+    GROUP(RW_IPE)
     {
-       .TI.persistent : {}                  /* For #pragma persistent            */
-       .cio           : {}                  /* C I/O Buffer                      */
-       .sysmem        : {}                  /* Dynamic memory allocation area    */
-    } PALIGN(0x0400), RUN_END(fram_rx_start) > 0x4400
+        GROUP(READ_WRITE_MEMORY)
+        {
+           .TI.persistent : {}              /* For #pragma persistent            */
+           .cio           : {}              /* C I/O Buffer                      */
+           .sysmem        : {}              /* Dynamic memory allocation area    */
+        } PALIGN(0x0400), RUN_START(fram_rw_start)
+
+        GROUP(IPENCAPSULATED_MEMORY)
+        {
+           .ipestruct     : {}              /* IPE Data structure                */
+           .ipe           : {}              /* IPE                               */
+           .ipe_const     : {}              /* IPE Protected constants           */
+           .ipe:_isr      : {}              /* IPE ISRs                          */
+           .ipe_vars      : type = NOINIT{} /* IPE variables                     */
+        } PALIGN(0x0400), RUN_START(fram_ipe_start) RUN_END(fram_ipe_end) RUN_END(fram_rx_start)
+    } > 0x4400
 
     .cinit            : {}  > FRAM          /* Initialization tables             */
     .pinit            : {}  > FRAM          /* C++ Constructor tables            */
+    .binit            : {}  > FRAM          /* Boot-time Initialization tables   */
     .init_array       : {}  > FRAM          /* C++ Constructor tables            */
     .mspabi.exidx     : {}  > FRAM          /* C++ Constructor tables            */
     .mspabi.extab     : {}  > FRAM          /* C++ Constructor tables            */
 #ifndef __LARGE_DATA_MODEL__
-    .const            : {} >> FRAM          /* Constant data                     */
+    .const            : {} > FRAM           /* Constant data                     */
 #else
     .const            : {} >> FRAM | FRAM2  /* Constant data                     */
 #endif
 
     .text:_isr        : {}  > FRAM          /* Code ISRs                         */
-#ifndef __LARGE_DATA_MODEL__
-    .text             : {} >> FRAM          /* Code                              */
+#ifndef __LARGE_CODE_MODEL__
+    .text             : {} > FRAM           /* Code                              */
 #else
     .text             : {} >> FRAM2 | FRAM  /* Code                              */
 #endif
-
-    GROUP(IPENCAPSULATED_MEMORY)
-    {
-       .ipestruct     : {}                  /* IPE Data structure             */
-       .ipe           : {}                  /* IPE                            */
-       .ipe:_isr      : {}                  /* IPE ISRs                       */
-       .ipe_vars      : type = NOINIT{}     /* IPE variables                  */
-    } PALIGN(0x0400), RUN_START(fram_ipe_start) RUN_END(fram_ipe_end) > FRAM
+#ifdef __TI_COMPILER_VERSION__
+  #if __TI_COMPILER_VERSION__ >= 15009000
+    #ifndef __LARGE_CODE_MODEL__
+    .TI.ramfunc : {} load=FRAM, run=RAM, table(BINIT)
+    #else
+    .TI.ramfunc : {} load=FRAM | FRAM2, run=RAM, table(BINIT)
+    #endif
+  #endif
+#endif
 
     .jtagsignature : {} > JTAGSIGNATURE     /* JTAG Signature                    */
     .bslsignature  : {} > BSLSIGNATURE      /* BSL Signature                     */
 
     GROUP(SIGNATURE_SHAREDMEMORY)
     {
-       .ipesignature   : {}                 /* IPE Signature                     */
-       .jtagpassword   : {}                 /* JTAG Password                     */
+        .ipesignature  : {}                 /* IPE Signature                     */
+        .jtagpassword  : {}                 /* JTAG Password                     */
     } > IPESIGNATURE
 
     .bss        : {} > RAM                  /* Global & static vars              */
@@ -177,10 +191,10 @@ SECTIONS
     .TI.noinit  : {} > RAM                  /* For #pragma noinit                */
     .stack      : {} > RAM (HIGH)           /* Software system stack             */
 
-    .infoA     : {} > INFOA              /* MSP430 INFO FRAM  Memory segments */
-    .infoB     : {} > INFOB
-    .infoC     : {} > INFOC
-    .infoD     : {} > INFOD
+    .infoA (NOLOAD) : {} > INFOA              /* MSP430 INFO FRAM  Memory segments */
+    .infoB (NOLOAD) : {} > INFOB
+    .infoC (NOLOAD) : {} > INFOC
+    .infoD (NOLOAD) : {} > INFOD
 
     /* MSP430 Interrupt vectors          */
     .int00       : {}               > INT00
@@ -274,7 +288,7 @@ SECTIONS
       fram_ipe_border1 = (_IPE_SEGB1>>4);
       fram_ipe_border2 = (_IPE_SEGB2>>4);
    #else                           // Automated sizes generated by the Linker
-      fram_ipe_border2 = (fram_ipe_end + 0x400)>> 4;
+      fram_ipe_border2 = fram_ipe_end >> 4;
       fram_ipe_border1 = fram_ipe_start >> 4;
    #endif
 
@@ -295,9 +309,18 @@ SECTIONS
       mpu_segment_border2 = _MPU_SEGB2 >> 4;
       mpu_sam_value = (_MPU_SAM0 << 12) | (_MPU_SAM3 << 8) | (_MPU_SAM2 << 4) | _MPU_SAM1;
    #else // Automated sizes generated by Linker
-      mpu_segment_border1 = fram_rx_start >> 4;
-      mpu_segment_border2 = fram_rx_start >> 4;
-      mpu_sam_value = 0x1513; // Info R, Seg3 RX, Seg2 R, Seg1 RW
+      #ifdef _IPE_ENABLE //if IPE is used in project too
+         //seg1 = any read + write persistent variables
+         //seg2 = ipe = read + write + execute access
+         //seg3 = code, read + execute only
+         mpu_segment_border1 = fram_ipe_start >> 4;
+         mpu_segment_border2 = fram_rx_start >> 4;
+         mpu_sam_value = 0x1573; // Info R, Seg3 RX, Seg2 RWX, Seg1 RW
+      #else
+         mpu_segment_border1 = fram_rx_start >> 4;
+         mpu_segment_border2 = fram_rx_start >> 4;
+         mpu_sam_value = 0x1513; // Info R, Seg3 RX, Seg2 R, Seg1 RW
+      #endif
    #endif
    #ifdef _MPU_LOCK
       #ifdef _MPU_ENABLE_NMI
@@ -320,58 +343,3 @@ SECTIONS
 
 -l msp430fr5969.cmd
 
-
-
-/* part of the old linker script:
-
-SECTIONS
-{
-    // Group: Forces several output sections to be allocated contiguously
-    GROUP(ALL_FRAM)
-    {
-       GROUP(READ_WRITE_MEMORY)
-       {
-          .cio        : {}                   // C I/O BUFFER, buffers for stdio functions from the run-time support library
-          .sysmem     : {}                   // DYNAMIC MEMORY ALLOCATION AREA, memory pool (heap) for dynamic memory allocation (malloc, etc)
-       } ALIGN(0x0200), RUN_START(fram_rw_start)
-
-       GROUP(READ_ONLY_MEMORY)
-       {
-          .cinit      : {}                   // INITIALIZATION TABLES, used to initialize global variables at startup
-          .pinit      : {}                   // C++ CONSTRUCTOR TABLES
-          .init_array : {}                   // C++ CONSTRUCTOR TABLES
-          .mspabi.exidx : {}                 // C++ CONSTRUCTOR TABLES
-          .mspabi.extab : {}                 // C++ CONSTRUCTOR TABLES
-          .const      : {}                   // CONSTANT DATA, defined with keyword const
-       } ALIGN(0x0200), RUN_START(fram_ro_start)
-
-       GROUP(EXECUTABLE_MEMORY)
-       {
-          .text       : {}                   // executable CODE
-       } ALIGN(0x0200), RUN_START(fram_rx_start)
-
-       GROUP(IPENCAPSULATED_MEMORY)
-       {
-          .ipestruct : {}                   // IPE Data structure
-          .ipe       : {}                   // IPE
-       } ALIGN(0x0200), RUN_START(fram_ipe_start) RUN_END(fram_ipe_end)
-
-    } > FRAM | FRAM2
-    // Note: The linker places the sections above into FRAM OR FRAM3, but not both. Use the '>>' operator to specify that the sections should be splitted and placed into all specified non-contiguous memory ranges.
-
-    // In the brackets {}, input files may be specified which go into the output section .abc. Ususally, no input files are specified.
-    // If no input files are specified, the linker takes all the .abc sections from all input files and puts them into the .abc output section.
-
-    .jtagsignature : {} > JTAGSIGNATURE   // JTAG SIGNATURE
-    .bslsignature  : {} > BSLSIGNATURE    // BSL SIGNATURE
-
-    GROUP(SIGNATURE_SHAREDMEMORY)
-    {
-       .ipesignature   : {}               // IPE SIGNATURE
-       .jtagpassword   : {}               // JTAG PASSWORD
-    } > IPESIGNATURE
-
-    .bss       : {} > RAM                 // GLOBAL & STATIC VARS, usually uninitialized variables
-    .data      : {} > RAM                 // GLOBAL & STATIC VARS, usually initialized variables
-    .stack     : {} > RAM (HIGH)          // SOFTWARE SYSTEM STACK
-*/

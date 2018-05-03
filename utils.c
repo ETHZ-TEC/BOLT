@@ -517,7 +517,7 @@ int8_t* getSystemInfoEncoded(int8_t* outBuffer)
 // print out the statistics and some information over UART
 void logStats()
 {
-  initUART();
+  //initUART();     -> already done in initMSP430()
 #if defined(ASYNC_INT_DEV_BOARD_V2)
 
   if (*lastErrorMsg == 0x00)
@@ -543,6 +543,7 @@ void logStats()
     while (PUSH_BUTTON_PRESSED);
   }
 #else
+  __delay_cycles(1000);
   // print out system information
   printLine((int8_t*)"\r\nBOLT - (c) 2015, ETH Zurich");
   printLine((int8_t*)"\r\nMCU: " MCU_DESC);
@@ -569,6 +570,8 @@ void logStats()
   {
     printLine((int8_t*)"Last error message:");
     printLine((int8_t*)lastErrorMsg);
+
+    printQueues();
   }
   #endif // DEBUG
 #endif
