@@ -84,7 +84,6 @@ const int8_t* eventToString[NUM_OF_EVENTS] = { (int8_t*)"REQ_HIGH", (int8_t*)"RE
   if (QUEUE_ISFULL(inst))\
   {\
     (FSMINST_APPL_PROC == inst) ? systemStats.fullCountA++ : systemStats.fullCountC++;\
-    (FSMINST_APPL_PROC == inst) ? LED_2_ON : LED_3_ON;\
     LOG_INFO((FSMINST_APPL_PROC == inst) ? "WARNING: Queue A to C is full!" : "WARNING in PORT4_ISR: Queue C to A is full!");\
     return STATE_IDLE;   /* abort, no space in the queue */\
   }\
@@ -141,7 +140,6 @@ const int8_t* eventToString[NUM_OF_EVENTS] = { (int8_t*)"REQ_HIGH", (int8_t*)"RE
   {\
     /* --- 3. update data structures (remove the message from the queue) --- */\
     QUEUE_REMOVE(inst);      /* this was a read operation: remove message from queue (= update meta data) */\
-    (FSMINST_APPL_PROC == inst) ? LED_3_OFF : LED_2_OFF;\
     (FSMINST_APPL_PROC == inst) ? systemStats.readCountA++ : systemStats.readCountC++;\
     /* --- 4. set IND = 0 if queue empty --- */\
     if (QUEUE_ISEMPTY(inst))\
@@ -195,21 +193,7 @@ FSMSTATE processTCRead(const FSMINSTANCE inst)
 // handle an "invalid" state transition (not necessarily an error condition!)
 FSMSTATE processInvalid(const FSMINSTANCE inst)
 {
-  // set rising edge active to prevent a deadlock (but only in IDLE!)
-  /*if (STATE_IDLE == currentState[inst])
-  {
-    if (FSMINST_APPL_PROC == inst)
-    {
-      SET_REQ_INTERRUPT_EDGE(FSMINST_APPL_PROC, EDGE_RISING);
-      CLEAR_REQ_IFG(inst); // clear the IFG to make sure no interrupt is triggered when switching the selection (see user guide p.310)
-    } else
-    {
-      SET_REQ_INTERRUPT_EDGE(FSMINST_COMM_PROC, EDGE_RISING);
-      CLEAR_REQ_IFG(FSMINST_COMM_PROC); // clear the IFG to make sure no interrupt is triggered when switching the selection (see user guide p.310)
-    }
-  }*/
   // just for debugging: see if this transition occurs
-  LED_1_OFF;
 
 #ifdef DEBUG
   if (STATE_IDLE != currentState[inst])

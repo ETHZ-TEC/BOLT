@@ -517,33 +517,6 @@ int8_t* getSystemInfoEncoded(int8_t* outBuffer)
 // print out the statistics and some information over UART
 void logStats()
 {
-  //initUART();     -> already done in initMSP430()
-#if defined(ASYNC_INT_DEV_BOARD_V2)
-
-  if (*lastErrorMsg == 0x00)
-  {
-    printLine((int8_t*)"\r\n\r\nError log: No error found");
-  } else
-  {
-    uint8_t count = 0;
-    printLine((int8_t*)"\r\n\r\nLast error message:");
-    printLine((int8_t*)lastErrorMsg);
-    while (PUSH_BUTTON_PRESSED)     // long-press (~2s) to delete the error message
-    {
-      if (count > 200)
-      {
-        eraseErrorMsg();
-        printLine((int8_t*)"Error message erased");
-        break;
-      }
-      WAIT(10);
-      count++;
-    }
-    LED_ERROR_OFF;
-    while (PUSH_BUTTON_PRESSED);
-  }
-#else
-  __delay_cycles(1000);
   // print out system information
   printLine((int8_t*)"\r\nBOLT - (c) 2015, ETH Zurich");
   printLine((int8_t*)"\r\nMCU: " MCU_DESC);
@@ -562,7 +535,7 @@ void logStats()
   printString(composeString((int8_t*)"-%h-%h", *(uint16_t*)(RAND_SEED_ADDR + 8), *(uint16_t*)(RAND_SEED_ADDR + 10), debugBuffer));
   printLine(composeString((int8_t*)"-%h-%h", *(uint16_t*)(RAND_SEED_ADDR + 12), *(uint16_t*)(RAND_SEED_ADDR + 14), debugBuffer));
 
-  #ifndef DEBUG
+#ifndef DEBUG
   if (*lastErrorMsg == 0x00)
   {
     printLine((int8_t*)"Error log: No error found");
@@ -570,9 +543,6 @@ void logStats()
   {
     printLine((int8_t*)"Last error message:");
     printLine((int8_t*)lastErrorMsg);
-
-    printQueues();
   }
-  #endif // DEBUG
-#endif
+#endif // DEBUG
 }

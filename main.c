@@ -39,10 +39,11 @@
  * - stays on if an error is detected
  *
  * Notes:
- * - Enable the large-data memory model in the compiler options
- *   (advanced/runtime tab) to place the program code into the upper
- *   memory space (0x10000 and above). Make sure all the memory addresses
- *   are 32-bit (replace pointer to uint16_t conversions).
+ * - By default, the small memory model is enabled, i.e. only the lower 64k of
+ *   the memory are used. To use all available memory (at the cost of some
+ *   computational overheat and larger pointers), the large data memory model
+ *   can be enabled in the compiler options (advanced/runtime tab). Make sure
+ *   all the memory addresses are 32-bit (replace pointer conversions).
  * - recommended compiler optimization: 4 (whole program), speed
  */
 
@@ -189,17 +190,8 @@ void collectStats(void)
   }
   systemStats.powerOnCount++;
 
-#ifdef PUSH_BUTTON_PORT
-  // output the whole FRAM data if P1.0 (push button pin) is high for at least 10ms
-  if (GPIO_getInputPinValueInline(PUSH_BUTTON_PORT, PUSH_BUTTON_PIN))
-  {
-    __delay_cycles(MCLK_CYCLES / 100);
-    if (GPIO_getInputPinValueInline(PUSH_BUTTON_PORT, PUSH_BUTTON_PIN))
-    {
-      printFRAM();
-    }
-  }
-#endif /* PUSH_BUTTON_PORT */
+  // make sure the signature is not omitted by the linker
+  (void)*(volatile uint16_t*)boltSig;
 }
 
 
@@ -211,20 +203,17 @@ int main(void)
   collectStats();
   validateSysState();  // restore the system state (init state machine)
   initQueues();      // initialize the required data structures
-  LOG_INFO("Initialization complete\r\n" LOG_LINE "\r\n");
 
 #ifndef DEBUG
   UART_DISABLE;
 #endif
+
   ENABLE_INTERRUPTS;
 
   // blink once
-  GPIO_setOutputHighOnPinInline(LED_1_PORT, LED_1_PIN);
+  GPIO_setOutputHighOnPinInline(LED_STATUS_PORT, LED_STATUS_PIN);
   WAIT(20);
-  GPIO_setOutputLowOnPinInline(LED_1_PORT, LED_1_PIN);
-
-  // make sure the signature is not omitted by the linker
-  (void)*(volatile uint16_t*)boltSig;
+  GPIO_setOutputLowOnPinInline(LED_STATUS_PORT, LED_STATUS_PIN);
 
   // --- READY, program execution starts here ---
 

@@ -42,7 +42,7 @@
 // prescalers and 1st and 2nd stage modulation coefficients; Note: prescaler = N / 16 where N = SMCLK_SPEED / BAUD_RATE
 const uint16_t UARTConfig[NUM_OF_UART_RATES][NUM_OF_MCLK_SPEEDS][3] =
 {
-  //   1 MHz       8 MHz      16 MHz
+  //  1 MHz           8 MHz            16 MHz
   { { 6, 8, 0x11 }, { 52, 1, 0x49 }, { 104,  2, 0xD6 } },    // 9600 Bd
   { { 0, 8, 0xD6 }, {  4, 5, 0x55 }, {   8, 10, 0xFB } },    // 115200 Bd
 };
@@ -56,21 +56,17 @@ void initSPI()
 
   // SPI A, 3-wire slave mode
   // set pins 4 to 6 of port 2 as secondary module function input (UCA0CLK, UCA1SIMO, UCA1SOMI)
-  GPIO_setAsInputPin(GPIO_PORT_P2, GPIO_PIN4 + GPIO_PIN5 + GPIO_PIN6);
   GPIO_setAsPeripheralModuleFunctionInputPinInline(GPIO_PORT_P2, GPIO_PIN4 + GPIO_PIN5 + GPIO_PIN6, GPIO_SECONDARY_MODULE_FUNCTION);
   EUSCI_SPI_slaveInitInline(EUSCI_A1_BASE,
                             EUSCI_A_SPI_MSB_FIRST,
                             (SPI_CKPH == SPI_CKPH_0) ? EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT : EUSCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,
                             (SPI_CKPL == SPI_CKPL_0) ? EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_LOW : EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_HIGH,
                             EUSCI_A_SPI_3PIN);
-  //EUSCI_A_SPI_enable(EUSCI_A1_BASE);
 
   // SPI B, 3-wire slave mode
   // set pin 2 of port 2 to input, secondary module function (UCB0CLK)
-  GPIO_setAsInputPin(GPIO_PORT_P2, GPIO_PIN2);  // enable the pulldown resistor to prevent floating inputs
   GPIO_setAsPeripheralModuleFunctionInputPinInline(GPIO_PORT_P2, GPIO_PIN2, GPIO_SECONDARY_MODULE_FUNCTION);
   // set pins 6 and 7 of port 1 to input, secondary module function (UCB0SIMO, UCB0SOMI)
-  GPIO_setAsInputPin(GPIO_PORT_P1, GPIO_PIN6 + GPIO_PIN7);
   GPIO_setAsPeripheralModuleFunctionInputPinInline(GPIO_PORT_P1, GPIO_PIN6 + GPIO_PIN7, GPIO_SECONDARY_MODULE_FUNCTION);
   EUSCI_SPI_slaveInitInline(EUSCI_B0_BASE,
                             EUSCI_B_SPI_MSB_FIRST,
@@ -99,7 +95,6 @@ void initUART()
                                EUSCI_A_UART_ONE_STOP_BIT,
                                EUSCI_A_UART_MODE,
                                EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION);  // oversampling mode recommended for N >= 16
-  GPIO_setAsOutputPinInline(GPIO_PORT_P2, GPIO_PIN1);
   EUSCI_UART_ENABLE;
 }
 
@@ -127,14 +122,6 @@ void initCtrlPins()
   GPIO_setAsInputPinInline(SPI_C_REQ_PORT, SPI_C_REQ_PIN);
   GPIO_setAsInputPinInline(SPI_A_MODE_PORT, SPI_A_MODE_PIN);
   GPIO_setAsInputPinInline(SPI_C_MODE_PORT, SPI_C_MODE_PIN);
-#ifndef INDICADE_ISR_WITH_FUTUREUSE // configure as inputs if pins are not used
-  #ifdef SPI_A_FUTUREUSE_PORT
-  GPIO_setAsInputPinInline(SPI_A_FUTUREUSE_PORT, SPI_A_FUTUREUSE_PIN);
-  #endif
-  #ifdef SPI_C_FUTUREUSE_PORT
-  GPIO_setAsInputPinInline(SPI_C_FUTUREUSE_PORT, SPI_C_FUTUREUSE_PIN);
-  #endif
-#endif
 }
 
 
@@ -192,7 +179,6 @@ void initFRAM()
   {
     FRAM_configureWaitStateControl(FRAM_ACCESS_TIME_CYCLES_0);  // not wait state needed for 8 MHz and below
   }
-  //FRAM_delayPowerUpFromLPM(FRAM_DELAY_FROM_LPM_ENABLE);
 }
 
 
@@ -205,14 +191,9 @@ void initMSP430()
   initClocks();             // Clocks before other settings!
   resetGPIOPins();          // configure all pins in output mode
   initCtrlPins();           // configure the GPIO pins needed for the handshake signaling
-#ifdef PUSH_BUTTON_PORT
-  GPIO_setAsInputPinWithPullDownresistorInline(PUSH_BUTTON_PORT, PUSH_BUTTON_PIN);  // init the user push-button
-#endif // PUSH_BUTTON_PORT
 
-  // now init eUSCI modules
-//#if defined(DEBUG) || defined(LOG_ERRORS)     // init anyway to print out stats
+  // init eUSCI modules
   initUART();
-//#endif
   initSPI();
 
   // disable the GPIO power-on default high-impedance mode to activate previously configured port settings

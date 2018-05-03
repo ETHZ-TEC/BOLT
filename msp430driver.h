@@ -43,68 +43,24 @@
 
 // LEDs
 #ifdef USE_LEDS
-  #define LED_1_TOGGLE      ( GPIO_toggleOutputOnPinInline(LED_1_PORT, LED_1_PIN) )      // PxOUT ^= BITy;
-  #define LED_2_TOGGLE      ( GPIO_toggleOutputOnPinInline(LED_2_PORT, LED_2_PIN) )
-  #define LED_3_TOGGLE      ( GPIO_toggleOutputOnPinInline(LED_3_PORT, LED_3_PIN) )
-  #define LED_4_TOGGLE      ( GPIO_toggleOutputOnPinInline(LED_4_PORT, LED_4_PIN) )
-  #define LED_1_ON          ( GPIO_setOutputHighOnPinInline(LED_1_PORT, LED_1_PIN) )       // PxOUT |= BITy;
-  #define LED_2_ON          ( GPIO_setOutputHighOnPinInline(LED_2_PORT, LED_2_PIN) )
-  #define LED_3_ON          ( GPIO_setOutputHighOnPinInline(LED_3_PORT, LED_3_PIN) )
-  #define LED_4_ON          ( GPIO_setOutputHighOnPinInline(LED_4_PORT, LED_4_PIN) )
-  #define LED_1_OFF         ( GPIO_setOutputLowOnPinInline(LED_1_PORT, LED_1_PIN) )      // PxOUT &= ~BITy;
-  #define LED_2_OFF         ( GPIO_setOutputLowOnPinInline(LED_2_PORT, LED_2_PIN) )
-  #define LED_3_OFF         ( GPIO_setOutputLowOnPinInline(LED_3_PORT, LED_3_PIN) )
-  #define LED_4_OFF         ( GPIO_setOutputLowOnPinInline(LED_4_PORT, LED_4_PIN) )
-  #define LED_ERROR_ON      ( GPIO_setOutputHighOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN) )
-  #define LED_ERROR_OFF     ( GPIO_setOutputLowOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN) )
   #define LED_STATUS_ON     ( GPIO_setOutputHighOnPinInline(LED_STATUS_PORT, LED_STATUS_PIN) )
   #define LED_STATUS_OFF    ( GPIO_setOutputLowOnPinInline(LED_STATUS_PORT, LED_STATUS_PIN) )
   #define LED_STATUS_TOGGLE ( GPIO_toggleOutputOnPinInline(LED_STATUS_PORT, LED_STATUS_PIN) )
 #else
-  // do NOT remove the BIT clear (preserve #instructions)
-  #define LED_1_TOGGLE      ( NOP4 )    // an LED on/off instruction takes 4 cycles
-  #define LED_2_TOGGLE      ( NOP4 )
-  #define LED_3_TOGGLE      ( NOP4 )
-  #define LED_4_TOGGLE      ( NOP4 )
-  #define LED_1_ON          ( NOP4 )
-  #define LED_2_ON          ( NOP4 )
-  #define LED_3_ON          ( NOP4 )
-  #define LED_4_ON          ( NOP4 )
-  #define LED_1_OFF         ( NOP4 )    // PxOUT &= ~BITy;
-  #define LED_2_OFF         ( NOP4 )
-  #define LED_3_OFF         ( NOP4 )
-  #define LED_4_OFF         ( NOP4 )
-  #define LED_ERROR_ON      ( GPIO_setOutputHighOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN) )   // let ERROR LED turn on
-  #define LED_ERROR_OFF     ( GPIO_setOutputLowOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN) )
   #define LED_STATUS_ON     ( NOP4 )
   #define LED_STATUS_OFF    ( NOP4 )
   #define LED_STATUS_TOGGLE ( NOP4 )
 #endif
+#define LED_ERROR_ON        ( GPIO_setOutputHighOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN) )   // let ERROR LED turn on
+#define LED_ERROR_OFF       ( GPIO_setOutputLowOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN) )
+#define LED_ERROR_TOGGLE    while (1) { GPIO_toggleOutputOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN); WAIT(100); }
 
 // GPIO
-#define GPIO_P1_RESET       { P1SEL0 = 0; P1SEL1 = 0; P1OUT = 0; P1DIR = 0xff; P1IFG = 0; }    // set all pins of port 1 as output (low) and clear interrupt flag
-#define GPIO_P2_RESET       { P2SEL0 = 0; P2SEL1 = 0; P2OUT = 0; P2DIR = 0xff; P2IFG = 0; }
-#define GPIO_P3_RESET       { P3SEL0 = 0; P3SEL1 = 0; P3OUT = 0; P3DIR = 0xff; P3IFG = 0; }
-#define GPIO_P4_RESET       { P4SEL0 = 0; P4SEL1 = 0; P4OUT = 0; P4DIR = 0xff; P4IFG = 0; }
+#define GPIO_P1_RESET       { P1SEL0 = 0; P1SEL1 = 0; P1REN = 0; P1OUT = 0; P1DIR = 0xff; P1IFG = 0; P1IE = 0; }    // set all pins of port 1 as output (low) and clear interrupt flag
+#define GPIO_P2_RESET       { P2SEL0 = 0; P2SEL1 = 0; P2REN = 0; P2OUT = 0; P2DIR = 0xff; P2IFG = 0; P2IE = 0; }
+#define GPIO_P3_RESET       { P3SEL0 = 0; P3SEL1 = 0; P3REN = 0; P3OUT = 0; P3DIR = 0xff; P3IFG = 0; P3IE = 0; }
+#define GPIO_P4_RESET       { P4SEL0 = 0; P4SEL1 = 0; P4REN = 0; P4OUT = 0; P4DIR = 0xff; P4IFG = 0; P4IE = 0; }
 #define GPIO_PJ_RESET       { PJSEL0 = 0; PJSEL1 = 0; PJOUT = 0; PJDIR = 0xff; }
-
-
-// DEBUG (use the slave select/enable pins as a debug pins)
-#ifndef INDICADE_ISR_WITH_FUTUREUSE
-  #define DEBUG_A_HIGH
-  #define DEBUG_A_LOW
-  #define DEBUG_A_TOGGLE
-  #define DEBUG_C_HIGH
-  #define DEBUG_C_LOW
-  #define DEBUG_C_TOGGLE
-#else
-  #define DEBUG_A_HIGH      ( GPIO_setOutputHighOnPinInline(SPI_A_FUTUREUSE_PORT, SPI_A_FUTUREUSE_PIN) )
-  #define DEBUG_A_LOW       ( GPIO_setOutputLowOnPinInline(SPI_A_FUTUREUSE_PORT, SPI_A_FUTUREUSE_PIN) )
-  #define DEBUG_A_TOGGLE    ( GPIO_toggleOutputOnPinInline(SPI_A_FUTUREUSE_PORT, SPI_A_FUTUREUSE_PIN) )
-  #define DEBUG_C_HIGH      ( GPIO_setOutputHighOnPinInline(SPI_C_FUTUREUSE_PORT, SPI_C_FUTUREUSE_PIN) )
-  #define DEBUG_C_LOW       ( GPIO_setOutputLowOnPinInline(SPI_C_FUTUREUSE_PORT, SPI_C_FUTUREUSE_PIN) )
-  #define DEBUG_C_TOGGLE    ( GPIO_toggleOutputOnPinInline(SPI_C_FUTUREUSE_PORT, SPI_C_FUTUREUSE_PIN) )
-#endif
 
 // helper macros related to low-power modes and interrupts
 #define ENTER_LPM4          ( __bis_SR_register(LPM4_bits) )        // enter LPM4 immediately

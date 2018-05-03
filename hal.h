@@ -34,16 +34,13 @@
  * hal.h
  * hardware abstraction layer for the MSP430FR5969
  *
- * definitions in this file are compatible with the Dual Processor Platform
+ * definitions in this file are compatible with the Dual Processor Platform (Rev 1.1 and 2)
  *
  * Note: when the master clock is set to 8 MHz, the max. supported SPI clock speed is 4 MHz.
  */
 
 #ifndef HAL_H
 #define HAL_H
-
-
-#define DPP2_BOLT                                // uncomment to compile for the version 2 of the DPP
 
 
 #define MCLK_SPEED              MCLK_SPEED_8MHZ  // system / main clock speed
@@ -57,24 +54,10 @@
 
 #define RAND_SEED_ADDR          0x1A30           // address of the unique 128-bit random number seed (1A30 - 1A3F, little endian)
 
-// LEDs on Dev. Board v2.0: 1.5, 1.4, 4.5 and 2.7  (on Dev. Board v1.0: 3.5, 3.7, 4.5 and 2.7)
-
-#ifdef DPP2_BOLT
-  #define LED_1_PORT            GPIO_PORT_P2     // Debug LED
-  #define LED_1_PIN             GPIO_PIN7
-  #define LED_ERROR_PORT        LED_1_PORT       // LED to turn on when an error occurs
-  #define LED_ERROR_PIN         LED_1_PIN        // LED to turn on when an error occurs
-#else
-  #define PUSH_BUTTON_PORT      GPIO_PORT_P1     // Debug Switch
-  #define PUSH_BUTTON_PIN       GPIO_PIN0
-  #define LED_1_PORT            GPIO_PORT_P2     // Debug LED
-  #define LED_1_PIN             GPIO_PIN7
-  #define LED_ERROR_PORT        LED_1_PORT       // LED to turn on when an error occurs
-  #define LED_ERROR_PIN         LED_1_PIN        // LED to turn on when an error occurs
-  #define SPI_A_FUTUREUSE_PORT  GPIO_PORT_P1
-  #define SPI_A_FUTUREUSE_PIN   GPIO_PIN1
-#endif // BOLT_V10
-
+#define LED_1_PORT              GPIO_PORT_P2     // Debug LED
+#define LED_1_PIN               GPIO_PIN7
+#define LED_ERROR_PORT          LED_1_PORT       // LED to turn on when an error occurs
+#define LED_ERROR_PIN           LED_1_PIN        // LED to turn on when an error occurs
 #define LED_STATUS_PORT         LED_1_PORT       // define a status LED
 #define LED_STATUS_PIN          LED_1_PIN
 
@@ -110,8 +93,6 @@
 #define SPI_A_ACK_PIN           GPIO_PIN3
 
 // Communication processor pins (Note: the pins C_IND, C_MODE, C_REQ and C_ACK must be on the same port)
-#define SPI_C_FUTUREUSE_PORT    GPIO_PORT_P1
-#define SPI_C_FUTUREUSE_PIN     GPIO_PIN2
 #define SPI_C_IND_PORT          GPIO_PORT_P4
 #define SPI_C_IND_PIN           GPIO_PIN0
 #define SPI_C_MODE_PORT         GPIO_PORT_P4

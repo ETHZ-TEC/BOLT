@@ -90,7 +90,6 @@
 #pragma vector=DMA_VECTOR
 __interrupt void DMA_ISR(void)
 {
-  DEBUG_C_TOGGLE;
   LOG_VERBOSE("DMA TC interrupt");
 
 #ifdef ENABLE_DOUBLE_ISR     // if double ISR feature is disabled, only one ISR may be executed
@@ -134,30 +133,12 @@ __interrupt void DMA_ISR(void)
     NOP7;   // if/else balancing
     NOP5;   // if/else balancing
   }
-  DEBUG_C_TOGGLE;
-}
-
-
-// handles interrupts on port 1
-#pragma vector=PORT1_VECTOR
-__interrupt void PORT1_ISR(void)
-{
-#ifdef PUSH_BUTTON_PORT
-  if (GPIO_getInterruptStatusInline(PUSH_BUTTON_PORT, PUSH_BUTTON_PIN) == PUSH_BUTTON_PIN)
-  {
-    GPIO_clearInterruptFlagInline(PUSH_BUTTON_PORT, PUSH_BUTTON_PIN);
-  } else
-  {
-    LOG_ERROR("ERROR: Unexpected interrupt on port 3!");
-  }
-#endif // PUSH_BUTTON_PORT
 }
 
 
 #pragma vector=PORT_COMM_PROC
 __interrupt void PORT_C_ISR(void)
 {
-  DEBUG_C_TOGGLE;
   LOG_VERBOSE("Interrupt on port 4");
 #ifdef DEBUG
   if (GPIO_getInterruptStatusInline(SPI_C_REQ_PORT, SPI_C_REQ_PIN))
@@ -181,7 +162,6 @@ __interrupt void PORT_C_ISR(void)
     LOG_ERROR("ERROR: Unexpected interrupt on port 4!");
   }
 #endif // DEBUG
-  DEBUG_C_TOGGLE;
 }
 
 
@@ -189,7 +169,6 @@ __interrupt void PORT_C_ISR(void)
 #pragma vector=PORT_APPL_PROC
 __interrupt void PORT_A_ISR(void)
 {
-  DEBUG_A_TOGGLE;
   LOG_VERBOSE("Interrupt on port 3");
 #ifdef DEBUG
   if (GPIO_getInterruptStatusInline(SPI_A_REQ_PORT, SPI_A_REQ_PIN))
@@ -213,7 +192,6 @@ __interrupt void PORT_A_ISR(void)
     LOG_ERROR("ERROR: Unexpected interrupt on port 3!");
   }
 #endif // DEBUG
-  DEBUG_A_TOGGLE;
 }
 
 
@@ -284,59 +262,59 @@ __interrupt void UNMI_ISR(void)
 
 /*
 #pragma vector=USCI_A1_VECTOR         // SPI A1 interrupts
-__interrupt void USCI_A1_ISR(void) { LED_ERROR_ON; }
+__interrupt void USCI_A1_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=USCI_B0_VECTOR         // SPI B0 interrupts
-__interrupt void USCI_B0_ISR(void) { LED_ERROR_ON; }
+__interrupt void USCI_B0_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=AES256_VECTOR
-__interrupt void AES256_ISR(void) { LED_ERROR_ON; }
+__interrupt void AES256_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=RTC_VECTOR
-__interrupt void RTC_ISR(void) { LED_ERROR_ON; }
+__interrupt void RTC_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER3_A1_VECTOR
-__interrupt void TIMER3_A1_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER3_A1_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER3_A0_VECTOR
-__interrupt void TIMER3_A0_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER3_A0_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=PORT2_VECTOR
-__interrupt void PORT2_ISR(void) { LED_ERROR_ON; }
+__interrupt void PORT2_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER2_A1_VECTOR
-__interrupt void TIMER2_A1_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER2_A1_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER2_A0_VECTOR
-__interrupt void TIMER2_A0_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER2_A0_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER1_A1_VECTOR
-__interrupt void TIMER1_A1_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER1_A1_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER1_A0_VECTOR
-__interrupt void TIMER1_A0_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER1_A0_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER0_A1_VECTOR
-__interrupt void TIMER0_A1_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER0_A1_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER0_A0_VECTOR
-__interrupt void TIMER0_A0_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER0_A0_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=ADC12_VECTOR
-__interrupt void ADC12_ISR(void) { LED_ERROR_ON; }
+__interrupt void ADC12_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=USCI_A0_VECTOR
-__interrupt void USCI_A0_ISR(void) { LED_ERROR_ON; }
+__interrupt void USCI_A0_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=WDT_VECTOR
-__interrupt void WDT_ISR(void) { LED_ERROR_ON; }
+__interrupt void WDT_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER0_B1_VECTOR
-__interrupt void TIMER0_B1_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER0_B1_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=TIMER0_B0_VECTOR
-__interrupt void TIMER0_B0_ISR(void) { LED_ERROR_ON; }
+__interrupt void TIMER0_B0_ISR(void) { LED_ERROR_TOGGLE; }
 
 #pragma vector=COMP_E_VECTOR
-__interrupt void COMP_E_ISR(void) { LED_ERROR_ON; }
+__interrupt void COMP_E_ISR(void) { LED_ERROR_TOGGLE; }
 */

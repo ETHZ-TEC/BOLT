@@ -88,7 +88,6 @@ typedef enum
 
 /* function prototypes */
 
-void initUART();
 void initMSP430();
 
 
