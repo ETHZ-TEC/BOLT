@@ -62,6 +62,7 @@ typedef struct
   uint32_t powerOnCount;
   uint32_t powerLossCount;
   uint32_t crashCount;    // startup in invalid system state, e.g. power loss during write/read operation
+  uint32_t invStateCount; // invalid state transition
   uint32_t abortCountA;
   uint32_t abortCountC;
   uint32_t writeCountA;

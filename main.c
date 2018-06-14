@@ -204,16 +204,15 @@ int main(void)
   validateSysState();  // restore the system state (init state machine)
   initQueues();      // initialize the required data structures
 
-#ifndef DEBUG
-  UART_DISABLE;
-#endif
-
-  ENABLE_INTERRUPTS;
-
   // blink once
   GPIO_setOutputHighOnPinInline(LED_STATUS_PORT, LED_STATUS_PIN);
   WAIT(20);
   GPIO_setOutputLowOnPinInline(LED_STATUS_PORT, LED_STATUS_PIN);
+
+#ifndef DEBUG
+  UART_DISABLE;
+#endif
+  ENABLE_INTERRUPTS;
 
   // --- READY, program execution starts here ---
 

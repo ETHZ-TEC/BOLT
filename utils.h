@@ -37,7 +37,8 @@
 
 #ifndef UTILS_H
 #define UTILS_H
-
+
+
 #define DEBUG_BUFFER_SIZE       128
 #define ERROR_BUFFER_SIZE       128
 
@@ -62,7 +63,7 @@
                                         { \
                                           printString((int8_t*)"ERROR: Assertion failed "); \
                                           printLine(getFileAndLineString(debugBuffer, (int8_t*)__FILE__, __LINE__)); \
-                                          LED_ERROR_ON; \
+                                          LED_ERROR_TOGGLE; \
                                         }
   #ifdef DEBUG_VERBOSE
   #define LOG_VERBOSE(msg)              LOG_INFO(msg)

@@ -194,7 +194,7 @@ FSMSTATE processTCRead(const FSMINSTANCE inst)
 FSMSTATE processInvalid(const FSMINSTANCE inst)
 {
   // just for debugging: see if this transition occurs
-
+  systemStats.invStateCount++;
 #ifdef DEBUG
   if (STATE_IDLE != currentState[inst])
   {

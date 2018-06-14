@@ -199,40 +199,35 @@ __interrupt void PORT_A_ISR(void)
 #pragma vector=SYSNMI_VECTOR
 __interrupt void SYSNMI_ISR(void)
 {
-  LED_ERROR_ON;
   switch(__even_in_range(SYSSNIV, SYSSNIV_CBDIFG))
   {
-  /*case SYSSNIV_SVS:       // sys low-power reset
-    LOG_ERROR("ERROR: non-maskable system interrupt occurred (SVS low-power reset)");
-    break;*/
   case SYSSNIV_UBDIFG:    // FRAM Uncorrectable bit Error
-    LOG_ERROR("ERROR: non-maskable system interrupt occurred (uncorrectable bit in FRAM)");
+    LOG_ERROR("ERROR: uncorrectable bit in FRAM");
     break;
-  /*case SYSSNIV_ACCTEIFG:    // access time error
-    LOG_ERROR("ERROR: non-maskable system interrupt occurred (access time error)");
-    break;*/
   case SYSSNIV_MPUSEGPIFG:  // enc. IP mem segm. violation
-    LOG_ERROR("ERROR: non-maskable system interrupt occurred (enc. IP memory segment violation)");
+    LOG_ERROR("ERROR: enc. IP memory segment violation");
     break;
   case SYSSNIV_MPUSEGIIFG:  // information mem segment violation
-    LOG_ERROR("ERROR: non-maskable system interrupt occurred (information memory segment violation)");
+    LOG_ERROR("ERROR: information memory segment violation");
     break;
   // MPU interrupt
   case SYSSNIV_MPUSEG1IFG:  // segment 1 mem violation
   case SYSSNIV_MPUSEG2IFG:  // segment 2 mem violation
   case SYSSNIV_MPUSEG3IFG:  // segment 3 mem violation
-    LOG_ERROR("ERROR: non-maskable system interrupt occurred (memory access violation)");
+    LOG_ERROR("ERROR: memory access violation");
     break;
   case SYSSNIV_VMAIFG:    // vacant mem access (invalid mem. address)
-    LOG_ERROR("ERROR: non-maskable system interrupt occurred (vacant memory access)");
+    LOG_ERROR("ERROR: vacant memory access");
     break;
   case SYSSNIV_JMBINIFG:    // mailbox input / output (JTAG)
   case SYSSNIV_JMBOUTIFG:
+    LOG_ERROR("ERROR: mailbox input / output SYSNMI");
     break;
   case SYSSNIV_CBDIFG:    // Correctable FRAM bit error detection -> maybe make some stats
+    LOG_ERROR("ERROR: correctable FRAM bit error detected");
     break;
   default:
-    LOG_ERROR("ERROR: Non-maskable system interrupt occurred (unknown)");  // maybe vacant memory access or access rights violation
+    LOG_ERROR("ERROR: non-maskable system interrupt occurred");
     break;
   }
 }
@@ -242,17 +237,16 @@ __interrupt void SYSNMI_ISR(void)
 #pragma vector=UNMI_VECTOR
 __interrupt void UNMI_ISR(void)
 {
-  LED_ERROR_ON;
   switch(__even_in_range(SYSUNIV, SYSUNIV_OFIFG))
   {
   case SYSUNIV_NMIIFG:
-    LOG_ERROR("ERROR: non-maskable user interrupt occurred (NMI pin)");
+    LOG_ERROR("ERROR: NMI pin");
     break;
   case SYSUNIV_OFIFG:
-    LOG_ERROR("ERROR: non-maskable user interrupt occurred (oscillator fault)");
+    LOG_ERROR("ERROR: oscillator fault");
     break;
   default:
-    LOG_ERROR("ERROR: Non-maskable user interrupt occurred (unknown)");
+    LOG_ERROR("ERROR: Non-maskable user interrupt occurred");
     break;
   }
 }

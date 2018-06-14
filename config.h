@@ -50,7 +50,7 @@
 //#define DEBUG                         // uncomment to enable debugging (UART output)
 //#define DEBUG_VERBOSE                 // log all messages in debug mode (comment this to suppress logging of "unimportant" or additional information)
 
-#define ENABLE_DOUBLE_ISR               // uncomment this to take use of the 'double ISR' feature: handle two interrupts within the same interrupt context (ISR), reduces the overhead, but also removes the priority equalization!
+//#define ENABLE_DOUBLE_ISR               // uncomment this to take use of the 'double ISR' feature: handle two interrupts within the same interrupt context (ISR), reduces the overhead, but also removes the priority equalization!
 
 
 #endif // CONFIG_H

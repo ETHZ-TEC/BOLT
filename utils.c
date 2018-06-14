@@ -492,28 +492,6 @@ int8_t* getEOS(int8_t* str)
 }
 
 
-// returns an encoded string containing the system information (version numbers and statistics); Note: outBuffer must be at least 284 bytes long!
-int8_t* getSystemInfoEncoded(int8_t* outBuffer)
-{
-  // Note: This function is slow and for debugging purpose only!
-  composeString((int8_t*)"mc=" MCU_DESC "&fw=%u&cv=%u", CODE_VS, COMPILER_VS, outBuffer);
-  composeString((int8_t*)"&po=%U&pl=%U", systemStats.powerOnCount, systemStats.powerLossCount, getEOS(outBuffer));
-  composeString((int8_t*)"&cc=%U&ms=%U", systemStats.crashCount, MESSAGE_SIZE, getEOS(outBuffer));
-  composeString((int8_t*)"&qa=%U&qc=%U", MAX_NUM_OF_MSG_A_TO_C, MAX_NUM_OF_MSG_C_TO_A, getEOS(outBuffer));
-  composeString((int8_t*)"&fa=%U&fc=%U", systemStats.fullCountA, systemStats.fullCountC, getEOS(outBuffer));
-  composeString((int8_t*)"&ra=%U&rc=%U", systemStats.readCountA, systemStats.readCountC, getEOS(outBuffer));
-  composeString((int8_t*)"&wa=%U&wc=%U", systemStats.writeCountA, systemStats.writeCountC, getEOS(outBuffer));
-  composeString((int8_t*)"&aa=%U&ac=%U", systemStats.abortCountA, systemStats.abortCountC, getEOS(outBuffer));
-  composeString((int8_t*)"&ba=%U&bc=%U", systemStats.writeByteCountA, systemStats.writeByteCountC, getEOS(outBuffer));
-  composeString((int8_t*)"&rs=%h%h", *(uint16_t*)RAND_SEED_ADDR, *(uint16_t*)(RAND_SEED_ADDR + 2), getEOS(outBuffer));
-  composeString((int8_t*)"%h%h", *(uint16_t*)(RAND_SEED_ADDR + 4), *(uint16_t*)(RAND_SEED_ADDR + 6), getEOS(outBuffer));
-  composeString((int8_t*)"%h%h", *(uint16_t*)(RAND_SEED_ADDR + 8), *(uint16_t*)(RAND_SEED_ADDR + 10), getEOS(outBuffer));
-  composeString((int8_t*)"%h%h", *(uint16_t*)(RAND_SEED_ADDR + 12), *(uint16_t*)(RAND_SEED_ADDR + 14), getEOS(outBuffer));
-
-  return outBuffer;
-}
-
-
 // print out the statistics and some information over UART
 void logStats()
 {
@@ -521,8 +499,9 @@ void logStats()
   printLine((int8_t*)"\r\nBOLT - (c) 2015, ETH Zurich");
   printLine((int8_t*)"\r\nMCU: " MCU_DESC);
   printLine(composeString((int8_t*)("Firmware version: %u (" COMPILE_DATE ")\r\nCompiler version: %u"), CODE_VS, COMPILER_VS, debugBuffer));
+  printLine(composeString((int8_t*)"Message size: %u", MESSAGE_SIZE, 0, debugBuffer));
   printLine(composeString((int8_t*)"Power-on count: %U\r\nPower failure count: %U", systemStats.powerOnCount, systemStats.powerLossCount, debugBuffer));
-  printLine(composeString((int8_t*)"Crash count: %U\r\nMessage size: %u", systemStats.crashCount, MESSAGE_SIZE, debugBuffer));
+  printLine(composeString((int8_t*)"Crash count: %U\r\nInvalid state transitions: %u", systemStats.crashCount, systemStats.invStateCount, debugBuffer));
   printLine(composeString((int8_t*)"Max. number of messages: %u A, %u C", MAX_NUM_OF_MSG_A_TO_C, MAX_NUM_OF_MSG_C_TO_A, debugBuffer));
   printLine(composeString((int8_t*)"Queue full count: %U A, %U C", systemStats.fullCountA, systemStats.fullCountC, debugBuffer));
   printLine(composeString((int8_t*)"Read count: %U A, %U C", systemStats.readCountA, systemStats.readCountC, debugBuffer));
