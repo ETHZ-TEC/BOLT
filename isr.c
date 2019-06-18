@@ -92,20 +92,6 @@ __interrupt void DMA_ISR(void)
 {
   LOG_VERBOSE("DMA TC interrupt");
 
-#ifdef ENABLE_DOUBLE_ISR     // if double ISR feature is disabled, only one ISR may be executed
-  if (DMA_GETINTERRUPTSTATUS(DMA_A))    // or use: (DMAIV == 0x02)
-  {
-    NOP5;   // make sure CALLA is executed after the same amount of cycles in both if's
-    processEvent(FSMINST_APPL_PROC, EVENT_TC);
-    DMA_CLEARINTERRUPT(DMA_A);
-  }
-  if (DMA_GETINTERRUPTSTATUS(DMA_C))
-  {
-    processEvent(FSMINST_COMM_PROC, EVENT_TC);
-    DMA_CLEARINTERRUPT(DMA_C);
-    NOP5;
-  }
-#else
   if (DMA_GETINTERRUPTSTATUS(DMA_A))    // or use: (DMAIV == 0x02)
   {
     processEvent(FSMINST_APPL_PROC, EVENT_TC);
@@ -116,7 +102,6 @@ __interrupt void DMA_ISR(void)
     processEvent(FSMINST_COMM_PROC, EVENT_TC);
     DMA_CLEARINTERRUPT(DMA_C);
   }
-#endif
 
   // enter LPM4 if the whole system is in idle
   if (STATE_IDLE == currentState[FSMINST_APPL_PROC])
@@ -146,15 +131,6 @@ __interrupt void PORT_C_ISR(void)
 #endif // DEBUG
     PORT_C_ISR_CODE;
 
-#ifdef ENABLE_DOUBLE_ISR
-    // check if an interrupt is pending at port 3
-    if (GPIO_getInterruptStatusInline(SPI_A_REQ_PORT, SPI_A_REQ_PIN))
-    {
-      LOG_VERBOSE("Priority given to port 4");
-      PORT_A_ISR_CODE;
-    }
-#endif
-
     ADJUST_LPM(FSMINST_COMM_PROC);
 #ifdef DEBUG
   } else
@@ -175,15 +151,6 @@ __interrupt void PORT_A_ISR(void)
   {
 #endif // DEBUG
     PORT_A_ISR_CODE;
-
-#ifdef ENABLE_DOUBLE_ISR
-    // check if an interrupt is pending at port 4
-    if (GPIO_getInterruptStatusInline(SPI_C_REQ_PORT, SPI_C_REQ_PIN))
-    {
-      LOG_VERBOSE("Priority given to port 4");
-      PORT_C_ISR_CODE;
-    }
-#endif
 
     ADJUST_LPM(FSMINST_APPL_PROC);
 #ifdef DEBUG

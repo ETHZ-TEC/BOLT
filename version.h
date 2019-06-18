@@ -39,7 +39,7 @@
 #define VERSION_H
 
 
-#define CODE_VS         1270                        // as a 4-digit unsigned integer, update manually!
+#define CODE_VS         1280                        // as a 4-digit unsigned integer, update manually!
 #define COMPILER_VS     __TI_COMPILER_VERSION__
 #define COMPILE_DATE    __DATE__
 #define MCU_DESC        "MSP430FR5969"              // string containing the MCU description including the revision number (max. 16 chars)

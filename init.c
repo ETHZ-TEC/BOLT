@@ -117,9 +117,9 @@ void resetGPIOPins()
 void initCtrlPins()
 {
   // Note: ACK, IND and PWR_SEL pins are already configured as output pins
-  // configure MODE and REQ pins as inputs with a pull-down resistor (default state 0)
-  GPIO_setAsInputPinInline(SPI_A_REQ_PORT, SPI_A_REQ_PIN);
-  GPIO_setAsInputPinInline(SPI_C_REQ_PORT, SPI_C_REQ_PIN);
+  // configure MODE and REQ pins as inputs (REQ with a pull-down resistor)
+  GPIO_setAsInputPinWithPullDownresistorInline(SPI_A_REQ_PORT, SPI_A_REQ_PIN);
+  GPIO_setAsInputPinWithPullDownresistorInline(SPI_C_REQ_PORT, SPI_C_REQ_PIN);
   GPIO_setAsInputPinInline(SPI_A_MODE_PORT, SPI_A_MODE_PIN);
   GPIO_setAsInputPinInline(SPI_C_MODE_PORT, SPI_C_MODE_PIN);
 }
@@ -137,7 +137,7 @@ void configPortInterrupt(const uint8_t port, const uint8_t pin, SIGNALEDGE trans
 // enables the port interrupts for the REQ pins
 void enablePortInterrupts()
 {
-  configPortInterrupt(SPI_A_REQ_PORT, SPI_A_REQ_PIN, EDGE_RISING);    // configure with pull-down resistor to have REQ == 0 when not connected
+  configPortInterrupt(SPI_A_REQ_PORT, SPI_A_REQ_PIN, EDGE_RISING);
   configPortInterrupt(SPI_C_REQ_PORT, SPI_C_REQ_PIN, EDGE_RISING);
 }
 

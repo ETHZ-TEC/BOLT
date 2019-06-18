@@ -52,9 +52,9 @@
 FIFOQueue queueAtoCCtrl = { 0 };                // control structure for queue from application to communication processor
 #pragma DATA_SECTION(queueCtoACtrl, ".sysmem")
 FIFOQueue queueCtoACtrl = { 0 };                // control structure for queue from communication to application processor
-#pragma DATA_SECTION(queueAtoCData, ".sysmem")
+#pragma DATA_SECTION(queueAtoCData, ".boltqueues")
 FIFOMessage queueAtoCData[MAX_NUM_OF_MSG_A_TO_C] = { 0 };     // the actual queue data (including the size of the messages)
-#pragma DATA_SECTION(queueCtoAData, ".sysmem")
+#pragma DATA_SECTION(queueCtoAData, ".boltqueues")
 FIFOMessage queueCtoAData[MAX_NUM_OF_MSG_C_TO_A] = { 0 };
 
 

@@ -49,10 +49,6 @@
 
 #include "main.h"
 
-
-#pragma PERSISTENT(boltSig)
-const uint16_t boltSig[8] = { 0xa0ad, 0x407d, 0x4373, 0x1661, 0xc93d, 0xde03, 0x1fa4, 0xfca8 };
-
 #pragma DATA_SECTION(systemStats, ".sysmem")
 SYSSTATS systemStats = { 0 };
 
@@ -189,9 +185,6 @@ void collectStats(void)
     break;
   }
   systemStats.powerOnCount++;
-
-  // make sure the signature is not omitted by the linker
-  (void)*(volatile uint16_t*)boltSig;
 }
 
 

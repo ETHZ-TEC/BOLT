@@ -498,7 +498,7 @@ void logStats()
   // print out system information
   printLine((int8_t*)"\r\nBOLT - (c) 2015, ETH Zurich");
   printLine((int8_t*)"\r\nMCU: " MCU_DESC);
-  printLine(composeString((int8_t*)("Firmware version: %u (" COMPILE_DATE ")\r\nCompiler version: %u"), CODE_VS, COMPILER_VS, debugBuffer));
+  printLine(composeString((int8_t*)("Firmware version: %u (" COMPILE_DATE ")\r\nCompiler version: %u"), CODE_VS, COMPILER_VS / 1000, debugBuffer));
   printLine(composeString((int8_t*)"Message size: %u", MESSAGE_SIZE, 0, debugBuffer));
   printLine(composeString((int8_t*)"Power-on count: %U\r\nPower failure count: %U", systemStats.powerOnCount, systemStats.powerLossCount, debugBuffer));
   printLine(composeString((int8_t*)"Crash count: %U\r\nInvalid state transitions: %u", systemStats.crashCount, systemStats.invStateCount, debugBuffer));
