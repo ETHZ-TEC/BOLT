@@ -53,7 +53,6 @@
 #endif
 #define LED_ERROR_ON        ( GPIO_setOutputHighOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN) )   // let ERROR LED turn on
 #define LED_ERROR_OFF       ( GPIO_setOutputLowOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN) )
-#define LED_ERROR_TOGGLE    while (1) { GPIO_toggleOutputOnPinInline(LED_ERROR_PORT, LED_ERROR_PIN); WAIT(100); }
 
 // GPIO
 #define GPIO_P1_RESET       { P1SEL0 = 0; P1SEL1 = 0; P1REN = 0; P1OUT = 0; P1DIR = 0xff; P1IFG = 0; P1IE = 0; }    // set all pins of port 1 as output (low) and clear interrupt flag
@@ -81,6 +80,7 @@
 #define UART_WAIT_FOR_TC          { while (!(EUSCI_UART_GETINTERRUPTSTATUS(0xff) & EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG)); }
 #define UART_WAIT_BSY             { while (EUSCI_SPI_ISBUSY(EUSCI_A0_BASE)); }  // same register for SPI and UART (EUSCI A module)
 #define UART_DISABLE              { UART_WAIT_BSY; EUSCI_UART_DISABLE; GPIO_setAsOutputPinInline(GPIO_PORT_P2, GPIO_PIN0); GPIO_setOutputLowOnPinInline(GPIO_PORT_P2, GPIO_PIN0); }
+#define UART_ENABLE               { GPIO_setAsPeripheralModuleFunctionInputPinInline(GPIO_PORT_P2, GPIO_PIN0, GPIO_SECONDARY_MODULE_FUNCTION); EUSCI_UART_ENABLE; }
 #define UART_SEND_BYTE(c)         { UART_WAIT_FOR_TC; EUSCI_UART_TRANSMITDATA(c); }
 #ifdef DEBUG
   #define CHECK_SPI_RXBUF_OVR_FLAG(write) {\

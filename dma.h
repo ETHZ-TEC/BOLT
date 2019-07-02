@@ -77,6 +77,10 @@
   } else  /* READ (transmit data from async interface to the application or communication processor) */\
   {\
     ASSERT(size <= MESSAGE_SIZE);\
+    if (size > MESSAGE_SIZE || size == 0)\
+    {\
+      LOG_ERROR("unexpected message size");\
+    }\
     DMA_initInline(DMAChannel,\
              DMA_TRANSFER_SINGLE,\
              size,    /* usually size - 1, but then the TC interrupt fires too early, i.e. when the last byte has been copied into the shift register and is about to be transferred! */\

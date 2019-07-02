@@ -425,7 +425,7 @@ void printFRAM()
 {
   // read application start address:
   uint16_t *startAddr = (uint16_t*)0x4400;
-
+  UART_ENABLE;
   while ((uint16_t)startAddr != 0)
   {
     printLine(composeString("%h: %h", (uint32_t)startAddr, *startAddr, debugBuffer));
@@ -517,10 +517,10 @@ void logStats()
 #ifndef DEBUG
   if (*lastErrorMsg == 0x00)
   {
-    printLine((int8_t*)"Error log: No error found");
+    printLine((int8_t*)"Last error: -");
   } else
   {
-    printLine((int8_t*)"Last error message:");
+    printString((int8_t*)"Last error: ");
     printLine((int8_t*)lastErrorMsg);
   }
 #endif // DEBUG

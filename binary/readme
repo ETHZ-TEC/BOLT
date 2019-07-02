@@ -9,7 +9,7 @@ BOLT_256b_noreset.hex
 BOLT_256b_reset.hex
 
 The different variants have different queue element sizes and behaviours after a reset.
-64, 128 or 256 bytes are the options for the size of one element in the BOLT queue. Since the amount of FRAM on BOLT is fixed, a larger element size automatically yields a smaller queue size.
+64, 128 or 256 bytes are the options for the size of one element in the BOLT queue. Since the amount of FRAM on BOLT is fixed, a larger element size automatically yields a smaller queue size. At 128 bytes per message, there is space for approx. 150 messages in each queue.
 The "noreset" in the name means the BOLT queue is not cleared after an MCU reset and therefore retains the data also in case of a power loss.
 
 In addition, there is also a BOLT deepsleep image, which basically just configures the GPIO pins and then enters LPM4. This image is intended to be used on DPP2 DevBoards in case the BOLT functionality is not needed.

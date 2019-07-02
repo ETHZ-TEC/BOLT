@@ -53,9 +53,9 @@ FIFOQueue queueAtoCCtrl = { 0 };                // control structure for queue f
 #pragma DATA_SECTION(queueCtoACtrl, ".sysmem")
 FIFOQueue queueCtoACtrl = { 0 };                // control structure for queue from communication to application processor
 #pragma DATA_SECTION(queueAtoCData, ".boltqueues")
-FIFOMessage queueAtoCData[MAX_NUM_OF_MSG_A_TO_C] = { 0 };     // the actual queue data (including the size of the messages)
+FIFOMessage queueAtoCData[MAX_NUM_OF_MSG_A_TO_C];     // the actual queue data (including the size of the messages)
 #pragma DATA_SECTION(queueCtoAData, ".boltqueues")
-FIFOMessage queueCtoAData[MAX_NUM_OF_MSG_C_TO_A] = { 0 };
+FIFOMessage queueCtoAData[MAX_NUM_OF_MSG_C_TO_A];
 
 
 // overwrite the whole queue memory with a custom value
@@ -71,12 +71,12 @@ void clearQueues()
 {
   queueAtoCCtrl.nextWrite = queueAtoCData;
   queueAtoCCtrl.nextRead  = queueAtoCData;
-  queueAtoCCtrl.first   = queueAtoCData;
-  queueAtoCCtrl.last    = &queueAtoCData[MAX_NUM_OF_MSG_A_TO_C - 1];
+  queueAtoCCtrl.first     = queueAtoCData;
+  queueAtoCCtrl.last      = &queueAtoCData[MAX_NUM_OF_MSG_A_TO_C - 1];
   queueCtoACtrl.nextWrite = queueCtoAData;
   queueCtoACtrl.nextRead  = queueCtoAData;
-  queueCtoACtrl.first   = queueCtoAData;
-  queueCtoACtrl.last    = &queueCtoAData[MAX_NUM_OF_MSG_C_TO_A - 1];
+  queueCtoACtrl.first     = queueCtoAData;
+  queueCtoACtrl.last      = &queueCtoAData[MAX_NUM_OF_MSG_C_TO_A - 1];
 #ifdef DEBUG
   fillQueueMemory(0x1234);
 #endif // DEBUG

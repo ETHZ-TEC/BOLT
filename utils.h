@@ -63,7 +63,7 @@
                                         { \
                                           printString((int8_t*)"ERROR: Assertion failed "); \
                                           printLine(getFileAndLineString(debugBuffer, (int8_t*)__FILE__, __LINE__)); \
-                                          LED_ERROR_TOGGLE; \
+                                          LED_ERROR_ON; \
                                         }
   #ifdef DEBUG_VERBOSE
   #define LOG_VERBOSE(msg)              LOG_INFO(msg)

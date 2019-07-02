@@ -133,7 +133,7 @@ const int8_t* eventToString[NUM_OF_EVENTS] = { (int8_t*)"REQ_HIGH", (int8_t*)"RE
     (FSMINST_APPL_PROC == inst) ? systemStats.writeCountA++ : systemStats.writeCountC++;\
     (FSMINST_APPL_PROC == inst) ? (systemStats.writeByteCountA += msgSize) : (systemStats.writeByteCountC += msgSize);\
     /* --- 4. set IND = 1 --- */\
-    SPI_IND_HIGH((FSMINST_APPL_PROC == inst) ? FSMINST_COMM_PROC : FSMINST_APPL_PROC);  /* now data is available for the other processor (do not use an if-statement here) */\
+    SPI_IND_HIGH((FSMINST_APPL_PROC == inst) ? FSMINST_COMM_PROC : FSMINST_APPL_PROC);  /* now data is available for the other processor */\
     LOG_INFO_1("%u bytes transfered", msgSize);\
     LOG_VERBOSE((FSMINST_APPL_PROC == inst) ? "Message added to queue A to C" : "Message added to queue C to A");\
   } else  /* a read operation has terminated */\
@@ -153,9 +153,9 @@ const int8_t* eventToString[NUM_OF_EVENTS] = { (int8_t*)"REQ_HIGH", (int8_t*)"RE
   SPI_ACK_LOW(inst);\
   /* --- 6. disable the SPI --- */\
   CHECK_SPI_RXBUF_OVR_FLAG(mode); /* a read will almost always result in a RX buffer overrun, therefore only check flag when a write was performed */\
-      EUSCI_SPI_RECEIVEDATA(SPI_ADDR(inst)); /* clear the receive buffer */\
-      DISABLE_SPI(inst);\
-      LOG_INFO("COMPLETED");\
+  EUSCI_SPI_RECEIVEDATA(SPI_ADDR(inst)); /* clear the receive buffer */\
+  DISABLE_SPI(inst);\
+  LOG_INFO("COMPLETED");\
 }
 
 #define CHECK_REQ_PIN(inst)   {\

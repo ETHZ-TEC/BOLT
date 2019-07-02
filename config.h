@@ -40,9 +40,9 @@
 #define CONFIG_H
 
 
-#define MESSAGE_SIZE              128   // max. size of 1 message in the queue in bytes, MUST be a multiple of 2!!
-#define MAX_NUM_OF_MSG_A_TO_C     148   // max. number of messages in queue A to C (~380 for 48 byte msg & debugging off)
-#define MAX_NUM_OF_MSG_C_TO_A     148   // max. number of messages in queue C to A
+#define MESSAGE_SIZE              128   // max. size of 1 message in the queue in bytes, must be a multiple of 2
+#define MAX_NUM_OF_MSG_A_TO_C     150   // max. number of messages in queue A to C, must be > 1
+#define MAX_NUM_OF_MSG_C_TO_A     150   // max. number of messages in queue C to A, must be > 1
 #define RESET_QUEUES_AT_STARTUP   0     // 0 = no queue reset (clear) at startup
 
 

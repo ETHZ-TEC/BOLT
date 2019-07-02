@@ -41,7 +41,7 @@
  * Notes:
  * - By default, the small memory model is enabled, i.e. only the lower 64k of
  *   the memory are used. To use all available memory (at the cost of some
- *   computational overheat and larger pointers), the large data memory model
+ *   computational overhead and larger pointers), the large data memory model
  *   can be enabled in the compiler options (advanced/runtime tab). Make sure
  *   all the memory addresses are 32-bit (replace pointer conversions).
  * - recommended compiler optimization: 4 (whole program), speed

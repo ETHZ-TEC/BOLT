@@ -61,8 +61,8 @@
 
 typedef struct FIFOMSG
 {
-  uint8_t   data[MESSAGE_SIZE];    // the message itself (payload)
-  uint16_t  size;          // message size in bytes (meta)
+  volatile uint8_t  data[MESSAGE_SIZE];   // the message itself (payload)
+  volatile uint16_t size;                 // message size in bytes (meta)
 } FIFOMessage;
 
 typedef struct FIFO
@@ -96,9 +96,7 @@ static __inline uint8_t queueIsEmpty(const FIFOQueue* const q)
 #pragma FUNC_ALWAYS_INLINE(queueIsFull)
 static __inline uint8_t queueIsFull(const FIFOQueue* const q)
 {
-  // two cases because the array is used as a circular buffer:
-  // - the usual case where the address of the write pointer is bigger than the address of the read pointer
-  // - and a special case where the write pointer is smaller than the read pointer, i.e. the write pointer points to the last element in the queue and the read pointer to the first
+  // full condition means write pointer is one behind the read pointer (corner case: wrap around at the end of the circular buffer)
   if (q->nextWrite < q->nextRead)
   {
     NOP2; // balance if/else
